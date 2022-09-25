@@ -1,27 +1,31 @@
 import 'package:car_tracking_system/MVC/Controllers/company_controller.dart';
 import 'package:car_tracking_system/MVC/Controllers/driver_controller.dart';
 import 'package:car_tracking_system/MVC/Models/company_model.dart';
+import 'package:car_tracking_system/MVC/Views/maps/map_widget.dart';
 import 'package:car_tracking_system/MVC/Views/partials/text_field.dart';
+import 'package:cross_scroll/cross_scroll.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../../../Models/driver_model.dart';
 import '../../../partials/buttons.dart';
 
-class RegisterVehicle extends StatefulWidget {
-  const RegisterVehicle({this.prefs, Key? key}) : super(key: key);
+class RegisterDriver extends StatefulWidget {
+  const RegisterDriver({this.prefs, Key? key}) : super(key: key);
   final Company? prefs;
   @override
-  _RegisterVehicleState createState() => _RegisterVehicleState();
+  _RegisterDriverState createState() => _RegisterDriverState();
 }
 
-class _RegisterVehicleState extends State<RegisterVehicle> {
+class _RegisterDriverState extends State<RegisterDriver> {
   final TextEditingController driverName = TextEditingController();
   final TextEditingController driverPhone = TextEditingController();
   final TextEditingController vehicleName = TextEditingController();
   final TextEditingController vehicleNumber = TextEditingController();
   final TextEditingController vehicleChassis = TextEditingController();
   final registrationFormKey = GlobalKey<FormState>();
-
+  LatLng? destination = const LatLng(34.0000, 71.00000);
+  ScrollController scrollController = ScrollController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,6 +71,26 @@ class _RegisterVehicleState extends State<RegisterVehicle> {
             AppTextField(
               hint: 'Vehicle Chassis',
               controller: vehicleChassis,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(
+                  top: 30, bottom: 4, left: 20, right: 20),
+              child: Text(
+                'Destination',
+                style: Theme.of(context).textTheme.headline5,
+              ),
+            ),
+            MapWidget(
+              height: 200,
+              margins: EdgeInsets.symmetric(horizontal: 10),
+              getPositions: (pos) {
+                setState(() {
+                  destination = pos;
+                });
+              },
+              marker: Marker(
+                  markerId: const MarkerId('currentMarker'),
+                  position: destination!),
             ),
             Padding(
               padding: const EdgeInsets.only(top: 30.0),

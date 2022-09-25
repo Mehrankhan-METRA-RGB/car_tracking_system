@@ -52,6 +52,7 @@ dependencies:
   location: ^4.4.0
 #  firebase_analytics: ^9.3.4
   share_plus: ^4.1.0
+  cross_scroll: ^0.0.75
 
 dev_dependencies:
   flutter_test:

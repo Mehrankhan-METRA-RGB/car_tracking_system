@@ -177,7 +177,7 @@ class dvrsListState extends State<DriversList> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => RegisterVehicle(
+                  builder: (context) => RegisterDriver(
                         prefs: prefs,
                       )));
         },

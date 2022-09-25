@@ -1,15 +1,22 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-
+import '../../Data/map_styles.dart';
 
 class MapWidget extends StatefulWidget {
-  const MapWidget({this.marker,this.getPositions,this.data,Key? key}) : super(key: key);
+  const MapWidget(
+      {this.marker, this.height,this.margins, this.width, this.getPositions, Key? key})
+      : super(key: key);
   final void Function(LatLng)? getPositions;
   final Marker? marker;
-  final dynamic data;
+  final double? width;
+  final double? height;
+  final EdgeInsetsGeometry? margins;
+
   // Marker(
   // markerId: MarkerId(office.name),
   // position: LatLng(office.lat, office.lng),
@@ -30,23 +37,28 @@ class MapWidgetState extends State<MapWidget> {
     zoom: 14.4746,
   );
 
-  static const CameraPosition _kLake = CameraPosition(
-      bearing: 192.8334901395799,
-      target: LatLng(37.43296265331129, -122.08832357078792),
-      tilt: 59.440717697143555,
-      zoom: 19.151926040649414);
 
   @override
   Widget build(BuildContext context) {
-    return GoogleMap(
-      myLocationEnabled:true,
-      mapType: MapType.normal,
-      initialCameraPosition: _kGooglePeshawar,
-      onMapCreated: (GoogleMapController controller) {
-        _controller.complete(controller);
-      },
-      markers: {widget.marker!},
-      onTap:widget.getPositions,
+    return Container(
+      margin:widget.margins?? EdgeInsets.zero,
+      width: widget.width ?? double.infinity,
+      height: widget.height ?? double.infinity,
+      // decoration: BoxDecoration(borderRadius: BorderRadius.circular(50)),
+      child: GoogleMap(
+        myLocationEnabled: true,
+        zoomControlsEnabled:false,
+        mapType: MapType.normal,
+        initialCameraPosition: _kGooglePeshawar,
+        onMapCreated: (GoogleMapController controller) {
+          controller.setMapStyle(mapStyles);
+          _controller.complete(controller);
+
+        },
+        markers: {widget.marker!},
+        onTap: widget.getPositions,
+        gestureRecognizers: Set()..add(Factory<EagerGestureRecognizer>(() => EagerGestureRecognizer())),
+      ),
     );
 
     //   Scaffold(
@@ -59,8 +71,8 @@ class MapWidgetState extends State<MapWidget> {
     // );
   }
 
-  Future<void> _goToTheLake() async {
-    final GoogleMapController controller = await _controller.future;
-    controller.animateCamera(CameraUpdate.newCameraPosition(_kLake));
-  }
+  // Future<void> _goToTheLake() async {
+  //   final GoogleMapController controller = await _controller.future;
+  //   controller.animateCamera(CameraUpdate.newCameraPosition(_kLake));
+  // }
 }

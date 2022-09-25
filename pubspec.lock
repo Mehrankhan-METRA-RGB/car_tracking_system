@@ -64,6 +64,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.16.0"
+  cross_scroll:
+    dependency: "direct main"
+    description:
+      name: cross_scroll
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.75"
   cupertino_icons:
     dependency: "direct main"
     description:
