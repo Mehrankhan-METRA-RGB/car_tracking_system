@@ -1,26 +1,30 @@
 import 'dart:convert';
 
+import 'package:car_tracking_system/MVC/Controllers/Repository/dynamic_links.dart';
 import 'package:car_tracking_system/MVC/Controllers/auth_controller.dart';
 import 'package:car_tracking_system/MVC/Controllers/company_controller.dart';
 import 'package:car_tracking_system/MVC/Models/company_model.dart';
 import 'package:car_tracking_system/MVC/Models/driver_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../Constants/widgets/widgets.dart';
-import '../../Models/Collections.dart';
-import 'forms/driver/show_live_map.dart';
-import 'forms/driver/vehicle_registration.dart';
+import '../../Models/collections.dart';
+import 'driverOptions/change_destination.dart';
+import 'driverOptions/chat_to_driver.dart';
+import 'driverOptions/show_live_map.dart';
+import 'forms/vehicle_registration.dart';
 
 class DriversList extends StatefulWidget {
   const DriversList({Key? key}) : super(key: key);
 
   @override
-  dvrsListState createState() => dvrsListState();
+  DriversListState createState() => DriversListState();
 }
 
-class dvrsListState extends State<DriversList> {
-  Company? prefs;
+class DriversListState extends State<DriversList> {
+  Company? company;
   TextEditingController searchController = TextEditingController();
   List<Driver>? drivers;
   List<Driver>? tempDrivers;
@@ -35,7 +39,7 @@ class dvrsListState extends State<DriversList> {
   getData() async {
     await AuthController.instance.get().then((value) {
       setState(() {
-        prefs = value;
+        company = value;
       });
     });
   }
@@ -80,7 +84,7 @@ class dvrsListState extends State<DriversList> {
               child: StreamBuilder<QuerySnapshot>(
                   stream: FirebaseFirestore.instance
                       .collection(Collection.company)
-                      .doc(prefs?.id)
+                      .doc(company?.id)
                       .collection(Collection.drivers)
                       .snapshots(),
                   builder: (context, snapshot) {
@@ -122,30 +126,102 @@ class dvrsListState extends State<DriversList> {
                                       ),
                                     ],
                                   ),
-                                  trailing: IconButton(
-                                    icon: const Icon(
-                                      Icons.more_vert,
-                                      color: Colors.green,
-                                    ),
-                                    onPressed: () {
-                                      print('${_driver.id} === ${prefs?.id}');
-                                      App.instance.dialog(context,
-                                          child: SizedBox(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.9,
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.8,
-                                            child: ShowLiveDriver(
-                                              driverId: _driver.id,
-                                              companyId: prefs?.id,
-                                            ),
-                                          ));
-                                    },
-                                  ),
+                                  trailing: App.instance.menu(
+                                      icon: Icons.more_vert,
+                                      iconColor: Colors.green,
+                                      items: [
+                                        menuItem(
+                                            title: 'Live',
+                                            value: 1,
+                                            icon: Icons.location_on),
+                                        menuItem(
+                                            title: 'Destinations',
+                                            value: 2,
+                                            icon: Icons.drive_eta),
+                                        menuItem(
+                                            title: 'Instruction',
+                                            value: 3,
+                                            icon: Icons.mark_email_read_sharp),
+                                        menuItem(
+                                            title: 'Share Token',
+                                            value: 4,
+                                            icon: Icons.share),
+                                        menuItem(
+                                            title: 'Security Link Share',
+                                            value: 5,
+                                            icon: Icons.security),
+                                        menuItem(
+                                            title: 'Delete Driver',
+                                            value: 6,
+                                            icon: Icons.delete),
+                                      ],
+                                      onSelected: (a) async {
+                                        switch (a) {
+                                          case 1:
+                                            App.instance.dialog(context,
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.9,
+                                                  height: MediaQuery.of(context)
+                                                          .size
+                                                          .height *
+                                                      0.8,
+                                                  child: ShowLiveDriver(
+                                                    driverId: _driver.id,
+                                                    companyId: company?.id,
+                                                  ),
+                                                ));
+                                            break;
+                                          case 2:
+                                            App.instance.dialog(context,
+                                                child: ChangeDestination(
+                                                  comp: company,
+                                                  driver: _driver,
+                                                ));
+                                            break;
+                                          case 3:
+                                            App.instance.dialog(context,
+                                                child: ChatToDriver(
+                                                  company: company,
+                                                  driver: _driver,
+                                                ));
+                                            break;
+                                          case 4:
+
+                                            ///Share Driver Token
+                                            String token =
+                                                '${company?.id}%${_driver.id}';
+                                            await Share.share(token,
+                                                subject:
+                                                    'Token for ${_driver.driverName}');
+                                            break;
+                                          case 5:
+
+                                            ///Share Driver Token
+                                            String token =
+                                                '${company?.id}%${_driver.id}';
+
+                                            await DynamicLinks
+                                                    .createDynamicLink(
+                                                        true, token)
+                                                .then((link) async =>
+                                                    await Share.share(link,
+                                                        subject:
+                                                            'Security Link For Driver name ${_driver.driverName} from Company ${company?.name}'));
+
+                                            break;
+                                          case 6:
+
+                                            ///`delete` Driver
+                                            await CompanyController.instance
+                                                .delete(context,
+                                                    companyId: company?.id,
+                                                    driverId: _driver.id);
+                                            break;
+                                        }
+                                      }),
                                 ),
                               ),
                             );
@@ -156,29 +232,13 @@ class dvrsListState extends State<DriversList> {
                   })),
         ],
       ),
-      // bottomNavigationBar: SizedBox(
-      //   height: 55,
-      //   child: Row(
-      //     mainAxisAlignment: MainAxisAlignment.spaceAround,
-      //     children: [
-      //       IconButton(
-      //           onPressed: () {
-      //
-      //           },
-      //           iconSize: 37,
-      //           color: Colors.green,
-      //           tooltip: 'Add  vehicle',
-      //           icon: const Icon(Icons.add))
-      //     ],
-      //   ),
-      // ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
               context,
               MaterialPageRoute(
                   builder: (context) => RegisterDriver(
-                        prefs: prefs,
+                        prefs: company,
                       )));
         },
         child: const Icon(Icons.add),
@@ -196,5 +256,27 @@ class dvrsListState extends State<DriversList> {
             .toList();
       });
     }
+  }
+
+  PopupMenuItem menuItem(
+      {required String title, required dynamic value, required IconData icon}) {
+    return PopupMenuItem(
+      textStyle: Theme.of(context)
+          .textTheme
+          .titleSmall!
+          .copyWith(color: Colors.black54),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(title),
+          Icon(
+            icon,
+            size: 15,
+            color: Colors.green,
+          ),
+        ],
+      ),
+      value: value,
+    );
   }
 }

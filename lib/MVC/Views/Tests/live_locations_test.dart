@@ -146,8 +146,8 @@ class _LiveMapsState extends State<LiveMaps> {
           log('${newLoc.latitude} === ${newLoc.longitude}');
 
         });
+        setState(() {});
 
-        // setState(() {});
       },
     );
     setState(() {});

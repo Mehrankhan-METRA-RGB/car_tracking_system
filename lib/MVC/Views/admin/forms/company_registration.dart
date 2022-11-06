@@ -1,12 +1,11 @@
 import 'package:car_tracking_system/MVC/Models/company_model.dart';
-import 'package:car_tracking_system/MVC/Views/admin/forms/company/login.dart';
 import 'package:car_tracking_system/MVC/Views/partials/text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '../../partials/buttons.dart';
+
 import 'after_company_registration.dart';
-import '../../../maps/map_widget.dart';
-import '../../../partials/buttons.dart';
 
 class RegisterCompany extends StatefulWidget {
   const RegisterCompany({Key? key}) : super(key: key);
@@ -27,22 +26,21 @@ class _RegisterCompanyState extends State<RegisterCompany> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        title: const Text('Register'),
-        actions: [
-          TextButton(
-            child: const Text(
-              'Go to Login',
-              style: TextStyle(fontSize: 14, color: Colors.white),
-            ),
-            onPressed: () {
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => const Login()));
-            },
-          ),
-        ],
-      ),
+      // appBar: AppBar(
+      //   elevation: 0,
+      //   actions: [
+      //     TextButton(
+      //       child: const Text(
+      //         'Go to Login',
+      //         style: TextStyle(fontSize: 14, color: Colors.white),
+      //       ),
+      //       onPressed: () {
+      //         Navigator.pushReplacement(context,
+      //             MaterialPageRoute(builder: (context) => const Login()));
+      //       },
+      //     ),
+      //   ],
+      // ),
       body: Form(
         key: registrationFormKey,
         child: ListView(
@@ -97,7 +95,7 @@ class _RegisterCompanyState extends State<RegisterCompany> {
               onChange: (a) {},
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 30.0),
+              padding: const EdgeInsets.only(top: 30.0,bottom: 80),
               child: AppButton(
                 child: const Text('Next'),
                 onPressed: () {

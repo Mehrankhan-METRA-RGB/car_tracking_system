@@ -92,7 +92,7 @@ class App {
   /// child: Text("First"),
   /// value: "first",
   /// ),
-  menu(
+ Widget menu(
       {required List<PopupMenuEntry> items,
       void Function(dynamic)? onSelected,
       IconData? icon,

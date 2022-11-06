@@ -1,22 +1,19 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:car_tracking_system/Constants/widgets/widgets.dart';
-import 'package:car_tracking_system/MVC/Models/Collections.dart';
-import 'package:car_tracking_system/MVC/Views/admin/list_of_drivers.dart';
+import 'package:car_tracking_system/MVC/Models/collections.dart';
+import 'package:car_tracking_system/MVC/Models/instructions_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Models/company_model.dart';
-import '../Views/admin/forms/company/login.dart';
 
 class CompanyController {
   CompanyController._private();
 
   static final instance = CompanyController._private();
-
-
 
   Future<void> update(BuildContext context,
       {required String collection,
@@ -55,7 +52,6 @@ class CompanyController {
     });
   }
 
-
   Future<List<Company>> fetch({collection}) async {
     return FirebaseFirestore.instance.collection(collection).get().then(
         (QuerySnapshot querySnapshot) => querySnapshot.docs
@@ -63,16 +59,46 @@ class CompanyController {
             .toList());
   }
 
-  Future<void> delete(BuildContext context, {collection, docs}) {
+  Future<void> delete(BuildContext context, {companyId, driverId}) {
     CollectionReference users =
-        FirebaseFirestore.instance.collection(collection);
+        FirebaseFirestore.instance.collection(Collection.company);
 
     return users
-        .doc(docs)
+        .doc(companyId)
+        .collection(Collection.drivers)
+        .doc(driverId)
         .delete()
         .then((value) => App.instance.snackBar(context,
             text: 'Deleted successfully', bgColor: Colors.blue))
         .catchError((error) => App.instance.snackBar(context,
             text: "Failed to delete : $error", bgColor: Colors.red));
+  }
+
+  Future<void> sendInstructions(Instruction message, {compId, driverId}) async {
+    CollectionReference<Map<String, dynamic>> ref = FirebaseFirestore.instance
+        .collection(Collection.company)
+        .doc(compId)
+        .collection(Collection.drivers)
+        .doc(driverId)
+        .collection(Collection.instructions);
+
+    ref.add(message.toMap()).then((a) {
+      a.update({'id': a.id});
+    });
+
+    log('~~ Message sent ~~');
+  }
+
+  Future<List<Company>> fetchInstruction({collection, compId, driverId}) async {
+    CollectionReference<Map<String, dynamic>> ref = FirebaseFirestore.instance
+        .collection(Collection.company)
+        .doc(compId)
+        .collection(Collection.drivers)
+        .doc(driverId)
+        .collection(Collection.instructions);
+    return FirebaseFirestore.instance.collection(collection).get().then(
+        (QuerySnapshot querySnapshot) => querySnapshot.docs
+            .map((e) => Company.fromJson(jsonEncode(e.data())))
+            .toList());
   }
 }

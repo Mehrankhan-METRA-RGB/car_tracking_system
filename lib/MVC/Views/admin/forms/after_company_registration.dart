@@ -1,12 +1,12 @@
 import 'package:car_tracking_system/Constants/values.dart';
 import 'package:car_tracking_system/MVC/Controllers/company_controller.dart';
-import 'package:car_tracking_system/MVC/Models/Collections.dart';
+import 'package:car_tracking_system/MVC/Models/collections.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-import '../../../../Models/company_model.dart';
-import '../../../partials/buttons.dart';
-import '../../../maps/map_widget.dart';
+import '../../../Models/company_model.dart';
+import '../../maps/map_widget.dart';
+import '../../partials/buttons.dart';
 import 'login.dart';
 
 class AfterRegistration extends StatefulWidget {
@@ -56,15 +56,16 @@ class _AfterRegistrationState extends State<AfterRegistration> {
             child: AppButton(
               child: const Text('Submit'),
               onPressed: () {
-
                 CompanyController.instance
                     .add(context,
                         collection: Collection.company,
                         data: _company!.copyWith(
                             points: [positions.latitude, positions.longitude]))
                     .then((docRef) {
-                  Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) => const Login()));
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const LoginCompany()));
                 });
               },
             ),

@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:car_tracking_system/Constants/widgets/widgets.dart';
-import 'package:car_tracking_system/MVC/Controllers/company_controller.dart';
-import 'package:car_tracking_system/MVC/Models/Collections.dart';
+import 'package:car_tracking_system/MVC/Models/collections.dart';
+import 'package:car_tracking_system/MVC/Models/instructions_model.dart';
 import 'package:car_tracking_system/MVC/Views/admin/list_of_drivers.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
@@ -45,15 +45,28 @@ class DriverController {
         .collection(Collection.drivers)
         .add(data.toMap())
         .then((value) {
-      print(value.id);
+      // print(value.id);
       users
           .doc(prefs?.id)
           .collection(Collection.drivers)
           .doc(value.id)
-          .update({'id':value.id});
+          .update({'id': value.id});
+      users
+          .doc(prefs?.id)
+          .collection(Collection.drivers)
+          .doc(value.id)
+          .collection(Collection.instructions)
+          .doc('dummy')
+          .set(Instruction(
+                  id: 'dummy',
+                  message: 'Chat Created',
+                  dateTime: DateTime.now().toString(),
+                  fromAdmin: true)
+              .toMap());
       App.instance
           .snackBar(context, text: 'driver Added!! ', bgColor: Colors.green);
       // print('done');
+      Navigator.pop(context);
 
       // AppBanner.instance.show(context,submissionText: 'Done',onSubmit: ()async{Navigator.pop(context);},  content: const Text('Done  Successfully'),backgroundColor: Colors.green);
       return value;
@@ -110,7 +123,7 @@ class DriverController {
   Future<void> updateCurrentLocation(
       {required String companyId,
       required String driverId,
-        String key='permanentPoints',
+      String key = 'permanentPoints',
       required List<double> data}) async {
     DocumentReference<Map<String, dynamic>> users = FirebaseFirestore.instance
         .collection(Collection.company)

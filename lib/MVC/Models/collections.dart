@@ -4,4 +4,5 @@ class Collection {
   //////////////////////////////////////////////
   static String get company => 'Company_Collection';
   static String get drivers => 'drivers';
+  static String get instructions => 'instructions';
 }

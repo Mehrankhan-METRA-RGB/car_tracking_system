@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -9,13 +10,21 @@ import '../../Data/map_styles.dart';
 
 class MapWidget extends StatefulWidget {
   const MapWidget(
-      {this.marker, this.height,this.margins, this.width, this.getPositions, Key? key})
+      {this.marker,
+      this.height,
+      this.margins,
+      this.width,
+      this.getPositions,
+        this.initialCamera,
+      Key? key})
       : super(key: key);
   final void Function(LatLng)? getPositions;
   final Marker? marker;
   final double? width;
   final double? height;
   final EdgeInsetsGeometry? margins;
+  final CameraPosition? initialCamera;
+
 
   // Marker(
   // markerId: MarkerId(office.name),
@@ -25,6 +34,8 @@ class MapWidget extends StatefulWidget {
   // snippet: office.address,
   // ),
   // )
+
+
   @override
   State<MapWidget> createState() => MapWidgetState();
 }
@@ -37,27 +48,31 @@ class MapWidgetState extends State<MapWidget> {
     zoom: 14.4746,
   );
 
-
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin:widget.margins?? EdgeInsets.zero,
+      margin: widget.margins ?? EdgeInsets.zero,
       width: widget.width ?? double.infinity,
       height: widget.height ?? double.infinity,
       // decoration: BoxDecoration(borderRadius: BorderRadius.circular(50)),
       child: GoogleMap(
         myLocationEnabled: true,
-        zoomControlsEnabled:false,
+        zoomControlsEnabled: false,
         mapType: MapType.normal,
-        initialCameraPosition: _kGooglePeshawar,
-        onMapCreated: (GoogleMapController controller) {
+        initialCameraPosition:widget.initialCamera??_kGooglePeshawar,
+        onMapCreated: (GoogleMapController controller)async {
           controller.setMapStyle(mapStyles);
           _controller.complete(controller);
 
+
         },
+       minMaxZoomPreference: const MinMaxZoomPreference(10,20),
         markers: {widget.marker!},
         onTap: widget.getPositions,
-        gestureRecognizers: Set()..add(Factory<EagerGestureRecognizer>(() => EagerGestureRecognizer())),
+
+        gestureRecognizers: Set()
+          ..add(
+              Factory<EagerGestureRecognizer>(() => EagerGestureRecognizer())),
       ),
     );
 

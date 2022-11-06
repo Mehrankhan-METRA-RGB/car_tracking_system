@@ -1,35 +1,38 @@
 import 'dart:convert';
+
 import 'package:car_tracking_system/Constants/widgets/widgets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../Models/Collections.dart';
+import '../Models/collections.dart';
 import '../Models/company_model.dart';
-import '../Views/admin/forms/company/login.dart';
+import '../Views/admin/forms/login.dart';
 import '../Views/admin/list_of_drivers.dart';
 import '../Views/rider/rider_map.dart';
 
 class AuthController {
   AuthController._private();
-
+  final auth = 'authLogin';
   static final instance = AuthController._private();
 
-  save(Company company) async {
+  Future save(Company company) async {
     Map<String, dynamic> _comp = company.toMap();
     final prefs = await SharedPreferences.getInstance();
-    for (var key in _comp.keys) {
-      if (key != 'points') {
-        print('$key:${_comp[key]}');
-        await prefs.setString(key, _comp[key]);
-      } else {
-        print('$key:${_comp[key]}');
 
-        await prefs.setStringList(
-            key, <String>['${_comp[key][0]}', '${_comp[key][1]}']);
-      }
-    }
+    await prefs.setString(auth, company.toJson());
+
+    // for (var key in _comp.keys) {
+    //   if (key != 'points') {
+    //     print('$key:${_comp[key]}');
+    //     await prefs.setString(key, _comp[key]);
+    //   } else {
+    //     print('$key:${_comp[key]}');
+    //
+    //     await prefs.setStringList(
+    //         key, <String>['${_comp[key][0]}', '${_comp[key][1]}']);
+    //   }
+    // }
   }
 
   Future<String?> getDriverAuth() async {
@@ -44,17 +47,20 @@ class AuthController {
 
   Future<Company> get() async {
     final prefs = await SharedPreferences.getInstance();
-    return Company(
-      id: prefs.getString('id'),
-      name: prefs.getString('name'),
-      email: prefs.getString('email'),
-      points:
-          prefs.getStringList('points')?.map((e) => double.parse(e)).toList(),
-      biography: prefs.getString('biography'),
-      license: prefs.getString('license'),
-      phone: prefs.getString('phone'),
-      password: prefs.getString('password'),
-    );
+    Company comp = Company.fromJson(prefs.getString(auth)!);
+// print('get Function:${comp.id}');
+    return comp;
+    // return Company(
+    //   id: prefs.getString('id'),
+    //   name: prefs.getString('name'),
+    //   email: prefs.getString('email'),
+    //   points:
+    //       prefs.getStringList('points')?.map((e) => double.parse(e)).toList(),
+    //   biography: prefs.getString('biography'),
+    //   license: prefs.getString('license'),
+    //   phone: prefs.getString('phone'),
+    //   password: prefs.getString('password'),
+    // );
   }
 
   void driverLogin(BuildContext context, String auth) async {
@@ -73,7 +79,7 @@ class AuthController {
             context,
             MaterialPageRoute(
                 builder: (context) => RiderLiveMaps(
-                      auth: auth,
+                      token: auth,
                     )));
       } else {
         App.instance.snackBar(context,
@@ -88,15 +94,16 @@ class AuthController {
         .where('email', isEqualTo: email)
         .where('password', isEqualTo: password)
         .get()
-        .then((QuerySnapshot querySnapshot) {
+        .then((QuerySnapshot querySnapshot) async {
       if (querySnapshot.docs.isNotEmpty) {
-        var a = querySnapshot.docs
+        // print(jsonEncode(querySnapshot.docs.first));
+        Company a = querySnapshot.docs
             .map((e) => Company.fromJson(jsonEncode(e.data())))
             .toList()
             .first;
 
         App.instance.snackBar(context, text: 'Done!!', bgColor: Colors.green);
-        save(a);
+        await save(a);
 
         Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (context) => const DriversList()));
@@ -135,6 +142,6 @@ class AuthController {
     }
 
     Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => const Login()));
+        context, MaterialPageRoute(builder: (context) => const LoginCompany()));
   }
 }

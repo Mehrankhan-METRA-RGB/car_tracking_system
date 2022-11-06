@@ -1,14 +1,14 @@
-import 'package:car_tracking_system/MVC/Controllers/company_controller.dart';
+import 'package:car_tracking_system/Constants/values.dart';
 import 'package:car_tracking_system/MVC/Controllers/driver_controller.dart';
 import 'package:car_tracking_system/MVC/Models/company_model.dart';
 import 'package:car_tracking_system/MVC/Views/maps/map_widget.dart';
 import 'package:car_tracking_system/MVC/Views/partials/text_field.dart';
-import 'package:cross_scroll/cross_scroll.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-import '../../../../Models/driver_model.dart';
-import '../../../partials/buttons.dart';
+import '../../../Models/driver_model.dart';
+
+import '../../partials/buttons.dart';
 
 class RegisterDriver extends StatefulWidget {
   const RegisterDriver({this.prefs, Key? key}) : super(key: key);
@@ -82,7 +82,7 @@ class _RegisterDriverState extends State<RegisterDriver> {
             ),
             MapWidget(
               height: 200,
-              margins: EdgeInsets.symmetric(horizontal: 10),
+              margins: const EdgeInsets.symmetric(horizontal: 10),
               getPositions: (pos) {
                 setState(() {
                   destination = pos;
@@ -111,8 +111,8 @@ class _RegisterDriverState extends State<RegisterDriver> {
                           vehicleName: vehicleName.text,
                           vehicleRegNo: vehicleNumber.text,
                           vehicleChassis: vehicleChassis.text,
-                          permanentPoints: [13.45456, 45.556556],
-                          destinationPoints: [13.45456, 45.556556],
+                          permanentPoints: widget.prefs!.points,
+                          destinationPoints: latLngToList(destination!),
                           nextPoints: [13.45456, 45.556556],
                         ));
                   }

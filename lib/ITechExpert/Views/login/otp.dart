@@ -16,8 +16,7 @@ class OTPScreen extends StatefulWidget {
 class _OTPScreenState extends State<OTPScreen> {
   final GlobalKey<ScaffoldState> _scaffoldkey = GlobalKey<ScaffoldState>();
   String? _verificationCode;
-  final TextEditingController _pinPutController =
-      TextEditingController();
+  final TextEditingController _pinPutController = TextEditingController();
 
   final defaultPinTheme = PinTheme(
     width: 56,
@@ -98,7 +97,8 @@ class _OTPScreenState extends State<OTPScreen> {
         },
         verificationFailed: (FirebaseAuthException e) {
           if (kDebugMode) {
-            App.instance.snackBar(context,text: 'Verification Failed',bgColor: Colors.redAccent);
+            App.instance.snackBar(context,
+                text: 'Verification Failed', bgColor: Colors.redAccent);
           }
         },
         codeSent: (String? verificationID, int? resendToken) {
@@ -120,6 +120,4 @@ class _OTPScreenState extends State<OTPScreen> {
     super.initState();
     _verifyPhone();
   }
-
-
 }

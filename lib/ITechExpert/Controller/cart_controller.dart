@@ -45,7 +45,9 @@ class CartController extends ChangeNotifier {
     // print(_items);
 
     Map count = {};
-    _items.forEach((i) => count[i] = (count[i] ?? 0) + 1);
+    for (var i in _items) {
+      count[i] = (count[i] ?? 0) + 1;
+    }
     // print(count.toString());
     _productCount = count;
     updatePrice();
