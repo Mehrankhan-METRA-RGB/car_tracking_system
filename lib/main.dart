@@ -4,9 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:native_notify/native_notify.dart';
-import 'package:provider/provider.dart';
 
-import 'ITechExpert/Controller/cart_controller.dart';
 import 'MVC/Controllers/Repository/dynamic_links.dart';
 import 'MVC/Views/rider/login.dart';
 
@@ -15,12 +13,7 @@ void main() async {
   await Firebase.initializeApp();
   WidgetsFlutterBinding.ensureInitialized();
   NativeNotify.initialize(2007, 'o5LrrkKjDVraW27Xp2yp2Z', null, null);
-  runApp(MultiProvider(
-    providers: [
-      ChangeNotifierProvider<CartController>(create: (_) => CartController()),
-    ],
-    child: const MyApp(),
-  ));
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {

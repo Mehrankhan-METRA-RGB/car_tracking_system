@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -15,7 +14,7 @@ class MapWidget extends StatefulWidget {
       this.margins,
       this.width,
       this.getPositions,
-        this.initialCamera,
+      this.initialCamera,
       Key? key})
       : super(key: key);
   final void Function(LatLng)? getPositions;
@@ -25,7 +24,6 @@ class MapWidget extends StatefulWidget {
   final EdgeInsetsGeometry? margins;
   final CameraPosition? initialCamera;
 
-
   // Marker(
   // markerId: MarkerId(office.name),
   // position: LatLng(office.lat, office.lng),
@@ -34,7 +32,6 @@ class MapWidget extends StatefulWidget {
   // snippet: office.address,
   // ),
   // )
-
 
   @override
   State<MapWidget> createState() => MapWidgetState();
@@ -59,35 +56,18 @@ class MapWidgetState extends State<MapWidget> {
         myLocationEnabled: true,
         zoomControlsEnabled: false,
         mapType: MapType.normal,
-        initialCameraPosition:widget.initialCamera??_kGooglePeshawar,
-        onMapCreated: (GoogleMapController controller)async {
+        initialCameraPosition: widget.initialCamera ?? _kGooglePeshawar,
+        onMapCreated: (GoogleMapController controller) async {
           controller.setMapStyle(mapStyles);
           _controller.complete(controller);
-
-
         },
-       minMaxZoomPreference: const MinMaxZoomPreference(10,20),
+        minMaxZoomPreference: const MinMaxZoomPreference(10, 20),
         markers: {widget.marker!},
         onTap: widget.getPositions,
-
         gestureRecognizers: Set()
           ..add(
               Factory<EagerGestureRecognizer>(() => EagerGestureRecognizer())),
       ),
     );
-
-    //   Scaffold(
-    //   body:
-    //   // floatingActionButton: FloatingActionButton.extended(
-    //   //   onPressed: _goToTheLake,
-    //   //   label: const Text('To the lake!'),
-    //   //   icon: const Icon(Icons.directions_boat),
-    //   // ),
-    // );
   }
-
-  // Future<void> _goToTheLake() async {
-  //   final GoogleMapController controller = await _controller.future;
-  //   controller.animateCamera(CameraUpdate.newCameraPosition(_kLake));
-  // }
 }
